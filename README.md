@@ -1,21 +1,24 @@
-Nutrisaas Core - Generated skeleton
+# Nutrisaas
 
-This project contains the 'core' module skeleton for the Nutrisaas product.
-It includes:
-- Spring Boot application
-- JPA entities: User, Role, Permission
-- Repositories
-- JWT-based security (TokenProvider, JwtFilter)
-- AuthController with /auth/login
-- UserService with a helper to register a nutritionist
+![Nutrisaas Logo](https://raw.githubusercontent.com/juanpablomh-dev/nutrisaas/refs/heads/main/src/main/resources/static/images/logo.png)
 
-How to run:
-1. Configure src/main/resources/application.properties with your PostgreSQL credentials and a secure app.jwt.secret
-2. Build with: mvn clean package
-3. Run: mvn spring-boot:run
+**Nutrisaas** es una plataforma SaaS multi-tenant construida con **Java Spring Boot**, frontend con **Webix**, y base de datos **PostgreSQL** alojada en [Neon](https://neon.tech). 
+Está diseñada para manejar datos sensibles de manera segura, con **encriptación**, **roles de usuario**, y **autenticación JWT**. 
+Todo el proyecto se despliega de forma **automática en Render usando Docker**.
 
-Note: This is a starter skeleton. Add more modules (patients, plans, appointments) following the package structure:
-com.nutrisaas.core
-com.nutrisaas.patients
-com.nutrisaas.appointments
-com.nutrisaas.plans
+---
+
+##  Tecnologías principales
+
+- **Backend:** Java 17, Spring Boot  
+- **Frontend:** JavaScript con Webix  
+- **Base de datos:** PostgreSQL (Neon)  
+- **Seguridad:** JWT, roles, encriptación de datos sensibles  
+- **Multi-tenant:** cada cliente tiene su espacio de datos aislado  
+- **API:** RESTful endpoints para consumo del frontend o terceros  
+- **Deploy:** Docker + Render (auto-deploy desde GitHub)  
+
+---
+
+##  Estructura del proyecto
+

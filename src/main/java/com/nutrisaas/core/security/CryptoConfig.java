@@ -12,7 +12,6 @@ public class CryptoConfig {
 
     @PostConstruct
     public void init() {
-        System.out.println("----> init cryptoKey");
         CryptoUtil.init(cryptoKey);
     }
 }
