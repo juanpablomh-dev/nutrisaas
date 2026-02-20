@@ -1,0 +1,33 @@
+<html lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Login - NutriSaaS</title>
+
+    <!-- Webix -->
+    <link rel="stylesheet" href="../../externos/webix/skins/material.css"/>
+    <script src="../../externos/webix/webix.js"></script>
+
+    <!-- Custom -->
+    <link rel="stylesheet" href="../../resources/css/custom.css"/>
+</head>
+<body>
+<div id="app"></div>
+
+<!-- Utilidades -->
+<script src="/app/utiles/ctes.js"></script>
+<script src="/app/utiles/utiles.js"></script>
+<script src="/app/utiles/utilesform.js"></script>
+
+<!-- UI y lógica -->
+<script src="login.ui.js"></script>
+<script src="login.logic.js"></script>
+
+<script>
+    webix.ready(function () {
+      const ui = LoginUI();
+      webix.ui(ui, $$("app"));
+      LoginLogic();
+    });
+</script>
+</body>
+</html>

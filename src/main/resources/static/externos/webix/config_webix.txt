@@ -1,0 +1,155 @@
+CAMBIO DE VERSIÓN:
+
+-- Versión actual: 7.4.0 (PRO)
+
+Se usa la versión completa de los fuentes para que se permita debugger (no la *.min).
+
+1.- Copiar .\webix\skins\compact.css a .\webix
+    y renombrar a webix.css (reemplazar el existente).
+
+2.- Iconos::
+
+    A partir de la versión 6.0 no se incluyen los iconos de font-awesome.
+    En la carpeta fonts, dejar los archivos fontawesome-webfont (todos).
+    Buscar en webix.css (el original de gia),  /*Inicio FontAwesome*/.
+    Copiar desde /*Inicio FontAwesome*/ a /*Fin FontAwesome*/ y pegarlo en el
+    nuevo .css (al final del archivo está bien).
+
+3.- Reemplazar en webix.css::
+
+    ../fonts/ por fonts/
+    'PT Sans' por 'Roboto'
+    font-size: 13px; por font-size: 11.5px;
+    line-height: 34px; por line-height: 25px;
+    line-height: 32px; por line-height: 23px;
+    #27ae60 por #3498DB
+    #24a259 por #3498DB
+    #219552 por #2489cc
+    #239d57 por #2489cc
+    buscar todos los .webix_el_icon .webix_el_box:hover
+    y cambiar el background-color por transparent.   
+    buscar .webix_progress_icon .webix_progress_state y cambiar el font-family por FontAwesome.
+    buscar .webix_icon_btn (sólo, sin ninguna otra clase) y cambiar margin-right: 4px; por margin-right: 0px;
+    buscar .webix_tab_more_icon y agregar color: #3498DB;
+    // buscar .webix_button (enter) .webixbutton {, ya cambiar el padding: padding: 0 0px;
+    buscar .webix_fieldset_label y sacar text-transform: uppercase;
+    buscar .webix_inp_counter_prev y cambiar los redondeos de bordes por 0px.
+            
+4.- Reemplazar en webix.css el radius por 3px en las siguientes propiedades:  
+
+    border-radius: 3px;
+    webkit-border-top-right-radius: 3px;
+    webkit-border-bottom-right-radius: 3px;
+    moz-border-radius-topright: 3px;
+    moz-border-radius-bottomright: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    
+    webkit-border-top-left-radius: 3px;
+    webkit-border-bottom-left-radius: 3px;
+    moz-border-radius-topleft: 3px;
+    moz-border-radius-bottomleft: 3px;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    
+    .webix_button,
+    .webixbutton {
+       border-radius: 3px;
+       ...
+    }
+    
+4.1 - modificar los siguientes estilos manualmente:
+
+// background-color en:
+.webix_secondary .webix_button:hover {
+  background-color: #3282b9;
+}
+
+// background-color en:
+.webix_secondary .webix_button:focus {
+  background-color: #0e69a7;
+}
+
+// background-color en:
+.webix_toolbar.webix_layout_subbar .webix_el_combo .webix_input_icon:hover,
+.webix_toolbar.webix_layout_subbar .webix_el_richselect .webix_input_icon:hover,
+.webix_toolbar.webix_layout_subbar .webix_el_datepicker .webix_input_icon:hover,
+.webix_toolbar.webix_layout_subbar .webix_el_colorpicker .webix_input_icon:hover,
+.webix_toolbar.webix_layout_subbar .webix_el_dbldatepicker .webix_input_icon:hover {
+  background-color: #3282b9;
+  color: #666666;
+}
+
+// margin-right en:
+.webix_icon_btn {
+  font-size: 17px;
+  display: inline-block;
+  text-align: center;
+  width: 20px;
+  margin-right: 5px;
+  color: #606060;
+}
+
+// border en:
+.webix_view .webix_pager_item_selected {
+  font-family: 'Roboto', Tahoma;
+  font-size: 11.5px;
+  color: #fff;
+  border: 1px solid #5a666d;
+  border-bottom: 1px solid #5a666d;
+  outline: none;
+  background: #5a666d;
+  color: #FFFFFF;
+  border: 1px solid #5a666d;
+  border-bottom: 1px solid #5a666d;
+}
+
+// Agregar este estilo (para configurar hover de los botones de seleccion):
+.webix_el_combo .webix_input_icon:hover,
+.webix_el_richselect .webix_input_icon:hover,
+.webix_el_datepicker .webix_input_icon:hover,
+.webix_el_colorpicker .webix_input_icon:hover,
+.webix_el_dbldatepicker .webix_input_icon:hover {
+   background-color: #3282b9;
+}
+    
+
+5.- Copiar flat.css y renombrar a webix-mobile.css.
+    Reemplazar:
+
+    ../fonts/ por fonts/
+    'PT Sans' por 'Roboto'
+    #27ae60 por #3498DB
+    #24a259 por #3498DB
+    #219552 por #2489cc
+    #239d57 por #2489cc
+    buscar todos los .webix_el_icon .webix_el_box:hover
+    y cambiar el color por transparent.  
+    buscar .webix_progress_icon .webix_progress_state y cambiar el font-family por FontAwesome.
+    buscar .webix_tab_more_icon y agregar color: #3498DB;
+    buscar .webix_fieldset_label y sacar text-transform: uppercase;
+    buscar .webix_inp_counter_prev y cambiar los redondeos de bordes por 0px.
+    Reemplazar los mismos borders que en webix.css.
+    Agregar fontawesome.
+
+6.- Reemplazar en webix.js:
+
+    wxi-menu-down por fa-angle-down
+    wxi-angle-double-left por fa-angle-double-left
+    wxi-angle-double-right por fa-angle-double-right
+    wxi-angle-left por fa-angle-left
+    wxi-angle-right por fa-angle-right 
+    wxi-calendar por fa-calendar
+    wxi-dots por fa-ellipsis-v
+    wxi-search por fa-search
+
+X.- NOTAS SOBRE CAMBIO DE VERSIÓN 4.3.0 a 7.3.0:: 
+
+    ->webix.toArray no funciona más (las columnas de una grilla son arrays, no hay que hacer conversión).
+    ->columns.insertAt no funciona más (usar arr.push o arr.splice(pos, 0, item).
+    ->columns.removeAt no funciona màs (usar arr.splice(pos, 1).
+    ->cambian los nombres de los iconos: icon: "user" cambia a icon:"fa-user" por ejemplo.
+    ->ya no se utiliza más "container" para la master page.
+      esto significa que los .ui que reciban el container como parámetro ya no lo deberían recibir más
+      y this.masterPage es igual a this.formUI.

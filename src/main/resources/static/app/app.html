@@ -1,0 +1,41 @@
+<html lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <title>NutriSaaS</title>
+
+    <!-- Webix -->
+    <link rel="stylesheet" href="../../externos/webix/skins/materialdesignicons.min.css"/>
+    <link rel="stylesheet" href="../../externos/webix/skins/material.css"/>
+    <script src="../../externos/webix/webix.js"></script>
+
+    <!-- Custom -->
+    <link rel="stylesheet" href="../../resources/css/custom.css"/>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- Utilidades y Componentes -->
+<script src="/app/utiles/ctes.js"></script>
+<script src="/app/utiles/components.js"></script>
+<script src="/app/utiles/utiles.js"></script>
+<script src="/app/utiles/utilesform.js"></script>
+
+<script src="app.ui.js"></script>
+<script src="app.logic.js"></script>
+
+<script>
+    webix.ready(function(){
+      if(!localStorage.getItem("authToken")){
+        window.location.href = "login.html";
+        return;
+      }
+      const ui = AppUI();
+      webix.ui(ui, $$("app"));
+      AppLogic();
+    });
+</script>
+</body>
+</html>
