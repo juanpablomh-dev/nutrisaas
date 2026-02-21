@@ -4,16 +4,14 @@ import com.nutrisaas.core.dto.AuthRequest;
 import com.nutrisaas.core.dto.AuthResponse;
 import com.nutrisaas.core.dto.ForgotPasswordRequest;
 import com.nutrisaas.core.dto.ResetPasswordRequest;
-import com.nutrisaas.core.exception.InvalidCredentialsException;
-import com.nutrisaas.core.model.Role;
 import com.nutrisaas.core.model.User;
 import com.nutrisaas.core.security.TokenProvider;
 import com.nutrisaas.core.security.tenant.NoTenant;
+import com.nutrisaas.core.service.AuthService;
 import com.nutrisaas.core.service.PasswordResetService;
-import com.nutrisaas.core.service.UserService;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,32 +21,19 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
+@AllArgsConstructor
 public class AuthController {
 
-    private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
+    private final AuthService authService;
     private final TokenProvider tokenProvider;
     private final PasswordResetService passwordResetService;
 
-    public AuthController(UserService userService,
-                          PasswordEncoder passwordEncoder,
-                          TokenProvider tokenProvider, PasswordResetService passwordResetService) {
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-        this.tokenProvider = tokenProvider;
-        this.passwordResetService = passwordResetService;
-    }
 
     @NoTenant
     @PostMapping("/login")
     public AuthResponse login(@RequestBody AuthRequest request) {
-        User user = userService.findByEmail(request.getEmail())
-                .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
-        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            throw new InvalidCredentialsException("Invalid credentials ");
-        }
-        String authorities = user.getRoles() == null ? "" : String.join(",", user.getRoles().stream().map(Role::getName).toList());
-        String token = tokenProvider.createToken(user, request.getRememberMe(), authorities);
+        User user = authService.validate(request.getEmail(), request.getPassword());
+        String token = tokenProvider.createToken(user, request.getRememberMe(), user.getAuthoritiesString());
         return new AuthResponse(token);
     }
 

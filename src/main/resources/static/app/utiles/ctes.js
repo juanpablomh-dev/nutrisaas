@@ -3,7 +3,8 @@ webix_skin = "material";
 
 let ctes = {
     K_CAMPO_URL_LOGIN: "login.html",
-    K_CAMPO_URL_APP: "/app/app.html",
+    K_CAMPO_ROOT_FOLDER: "/app/",
+    K_CAMPO_URL_APP: "app.html",
     K_CAMPO_FORM_LOGIN: "loginForm",
     K_CAMPO_BOTON_LOGIN: "loginBtn",
     K_CAMPO_BOTON_LOGOUT: "logoutBtn",

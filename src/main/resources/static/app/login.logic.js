@@ -10,7 +10,7 @@ function LoginLogic() {
 				if(res.status === 200 && res.data) {
 					Utiles.guardarToken(res.data, values.rememberMe);
 					webix.alert("Bienvenido " + values.email);
-					window.location.href = ctes.K_CAMPO_URL_APP;
+					window.location.href = ctes.K_CAMPO_ROOT_FOLDER + ctes.K_CAMPO_URL_APP;
 				} else {
 					webix.alert({
                         title: "Error",

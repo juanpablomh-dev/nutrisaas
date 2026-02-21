@@ -38,4 +38,9 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserTenant> userTenants;
+
+
+    public String getAuthoritiesString() {
+        return (getRoles() == null) ? "" : String.join(",", getRoles().stream().map(Role::getName).toList());
+    }
 }
