@@ -48,7 +48,7 @@ Utiles.secureRequest = function(method, url, payload, callback) {
             type:"alert-error"
         });
 
-        window.location.href = "/app/" + ctes.K_CAMPO_URL_LOGIN;
+        window.location.href = ctes.K_CAMPO_URL_LOGIN;
         return;
     }
 
@@ -94,7 +94,7 @@ Utiles.secureRequest = function(method, url, payload, callback) {
         // Manejo de errores de autenticación
         if (res.status === 401 || res.status === 403) {
             localStorage.removeItem(ctes.K_CAMPO_TOKEN);
-            window.location.href = "/app/" + ctes.K_CAMPO_URL_LOGIN;
+            window.location.href = ctes.K_CAMPO_URL_LOGIN;
             return;
         }
 

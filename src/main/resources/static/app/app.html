@@ -23,13 +23,13 @@
 <script src="/app/utiles/utiles.js"></script>
 <script src="/app/utiles/utilesform.js"></script>
 
-<script src="app.ui.js"></script>
-<script src="app.logic.js"></script>
+<script src="/app/app.ui.js"></script>
+<script src="/app/app.logic.js"></script>
 
 <script>
     webix.ready(function(){
       if(!localStorage.getItem("authToken")){
-        window.location.href = "login.html";
+        window.location.href = "/login/";
         return;
       }
       const ui = AppUI();

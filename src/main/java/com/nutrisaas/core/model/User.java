@@ -1,5 +1,6 @@
 package com.nutrisaas.core.model;
 
+import com.nutrisaas.core.dto.UserResponse;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -42,5 +43,13 @@ public class User {
 
     public String getAuthoritiesString() {
         return (getRoles() == null) ? "" : String.join(",", getRoles().stream().map(Role::getName).toList());
+    }
+
+    public UserResponse getUserResponseFromUser() {
+        UserResponse userResponse = new UserResponse();
+        userResponse.setEmail(getEmail());
+        userResponse.setFullName(getFullName());
+        userResponse.setEnabled(isEnabled());
+        return userResponse;
     }
 }

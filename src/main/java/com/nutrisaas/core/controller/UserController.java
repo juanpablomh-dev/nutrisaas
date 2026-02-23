@@ -1,6 +1,7 @@
 package com.nutrisaas.core.controller;
 
 import com.nutrisaas.core.dto.RegisterRequest;
+import com.nutrisaas.core.dto.UserResponse;
 import com.nutrisaas.core.model.User;
 import com.nutrisaas.core.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +20,8 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<UserResponse> register(@RequestBody RegisterRequest request) {
         User newUser = userService.register(request);
-        return ResponseEntity.ok(newUser);
+        return ResponseEntity.ok(newUser.getUserResponseFromUser());
     }
 }

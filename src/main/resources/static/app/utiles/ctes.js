@@ -2,9 +2,9 @@
 webix_skin = "material";
 
 let ctes = {
-    K_CAMPO_URL_LOGIN: "login.html",
+    K_CAMPO_URL_LOGIN: "/login/",
     K_CAMPO_ROOT_FOLDER: "/app/",
-    K_CAMPO_URL_APP: "app.html",
+    K_CAMPO_URL_APP: "/app/",
     K_CAMPO_FORM_LOGIN: "loginForm",
     K_CAMPO_BOTON_LOGIN: "loginBtn",
     K_CAMPO_BOTON_LOGOUT: "logoutBtn",
@@ -39,7 +39,7 @@ let http = {
 
 let services = {
     // Login
-    K_SERVICE_LOGIN: "/auth/login",
+    K_SERVICE_LOGIN: "/auth/v1/login",
     // Units
     K_SERVICE_UNIT_GET: "/api/tenant/units",
     K_SERVICE_UNIT_POST: "/api/tenant/units",

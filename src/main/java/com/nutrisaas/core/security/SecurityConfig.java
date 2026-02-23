@@ -40,8 +40,19 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/docs",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**"
+                        ).permitAll()
+                        
+                        .requestMatchers("/app").permitAll()
+                        .requestMatchers("/app/").permitAll()
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/login/").permitAll()
+
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/api/user/register").hasRole("ADMIN")
+                        .requestMatchers("/api/user/register").permitAll()//hasRole("ADMIN")
 
                         .requestMatchers("/api/tenant/units").permitAll()
                         .requestMatchers("/api/tenant/measurement-types").permitAll()

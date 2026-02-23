@@ -11,6 +11,6 @@ function AppLogic() {
     // Logout
     $$(ctes.K_CAMPO_BOTON_LOGOUT).attachEvent(evento.K_EVENTO_ITEM_CLICK, function(){
         Utiles.eliminarToken(ctes.K_CAMPO_TOKEN);
-        window.location.href = "/app/" + ctes.K_CAMPO_URL_LOGIN;
+        window.location.href = ctes.K_CAMPO_URL_LOGIN;
     });
 }

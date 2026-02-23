@@ -1,7 +1,6 @@
 package com.nutrisaas.core.service;
 
 import com.nutrisaas.core.exception.InvalidCredentialsException;
-import com.nutrisaas.core.exception.InvalidUserRoleException;
 import com.nutrisaas.core.model.User;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,7 +15,7 @@ public class AuthService {
 
     public User validate(String email, String password) {
         User user = userService.findByEmail(email)
-                .orElseThrow(() -> new InvalidUserRoleException("User not exists"));
+                .orElseThrow(() -> new InvalidCredentialsException("User not exists"));
 
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
             throw new InvalidCredentialsException("Invalid credentials ");
