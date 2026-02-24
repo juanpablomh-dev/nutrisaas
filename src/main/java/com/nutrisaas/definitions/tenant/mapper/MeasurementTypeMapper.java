@@ -6,10 +6,14 @@ import org.mapstruct.Mapper;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        uses = {UnitMapper.class}
+)
 public interface MeasurementTypeMapper {
 
     MeasurementTypeDTO toDTO(MeasurementType entity);
 
     List<MeasurementTypeDTO> toDTOList(List<MeasurementType> measurementTypes);
+
 }

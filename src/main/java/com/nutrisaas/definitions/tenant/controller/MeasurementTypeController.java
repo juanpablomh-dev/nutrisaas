@@ -2,6 +2,7 @@ package com.nutrisaas.definitions.tenant.controller;
 
 import com.nutrisaas.core.security.TokenProvider;
 import com.nutrisaas.core.security.tenant.TenantContext;
+import com.nutrisaas.definitions.tenant.dto.MeasurementTypeDTO;
 import com.nutrisaas.definitions.tenant.model.MeasurementType;
 import com.nutrisaas.definitions.tenant.service.IMeasurementTypeService;
 import lombok.RequiredArgsConstructor;
@@ -21,21 +22,21 @@ public class MeasurementTypeController {
 
 
     @GetMapping
-    public ResponseEntity<List<MeasurementType>> findByTenant() {
+    public ResponseEntity<List<MeasurementTypeDTO>> findByTenant() {
         return ResponseEntity.ok(measurementTypeService.findByTenantId(TenantContext.getTenant()));
     }
 
     @PostMapping
-    public ResponseEntity<MeasurementType> createByTenant(@RequestBody MeasurementType data) {
+    public ResponseEntity<MeasurementTypeDTO> createByTenant(@RequestBody MeasurementType data) {
         data.setId(null);
-        MeasurementType created = measurementTypeService.saveByTenant(data, TenantContext.getTenant());
+        MeasurementTypeDTO created = measurementTypeService.saveByTenant(data, TenantContext.getTenant());
         return ResponseEntity.created(URI.create("/api/tenant/measurement-types")).body(created);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MeasurementType> updateByTenant(@PathVariable Long id, @RequestBody MeasurementType data) {
+    public ResponseEntity<MeasurementTypeDTO> updateByTenant(@PathVariable Long id, @RequestBody MeasurementType data) {
         data.setId(id);
-        MeasurementType updated = measurementTypeService.saveByTenant(data, TenantContext.getTenant());
+        MeasurementTypeDTO updated = measurementTypeService.saveByTenant(data, TenantContext.getTenant());
         return ResponseEntity.ok(updated);
     }
 

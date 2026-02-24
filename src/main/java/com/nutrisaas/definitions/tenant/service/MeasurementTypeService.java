@@ -2,6 +2,8 @@ package com.nutrisaas.definitions.tenant.service;
 
 import com.nutrisaas.core.exception.ApiConflictException;
 import com.nutrisaas.core.exception.ApiNotFoundException;
+import com.nutrisaas.definitions.tenant.dto.MeasurementTypeDTO;
+import com.nutrisaas.definitions.tenant.mapper.MeasurementTypeMapper;
 import com.nutrisaas.definitions.tenant.model.MeasurementType;
 import com.nutrisaas.definitions.tenant.repository.MeasurementTypeRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,32 +19,36 @@ import java.util.List;
 public class MeasurementTypeService implements IMeasurementTypeService {
 
     private final MeasurementTypeRepository measurementTypeRepository;
+    private final MeasurementTypeMapper measurementTypeMapper;
 
     @Override
-    public List<MeasurementType> findByTenantId(String tenant) {
-        return measurementTypeRepository.findByTenant(tenant);
+    public List<MeasurementTypeDTO> findByTenantId(String tenant) {
+        return measurementTypeMapper.toDTOList(measurementTypeRepository.findByTenant(tenant));
     }
 
     @Override
-    public MeasurementType findByIdAndTenant(Long id, String tenant) {
-        return measurementTypeRepository.findByIdAndTenant(id, tenant)
+    public MeasurementTypeDTO findByIdAndTenant(Long id, String tenant) {
+        MeasurementType measurementType = measurementTypeRepository.findByIdAndTenant(id, tenant)
                 .orElseThrow(() -> new ApiNotFoundException("Tipo de Medida con id " + id + " no encontrada"));
+        return measurementTypeMapper.toDTO(measurementType);
     }
 
     @Override
-    public MeasurementType saveByTenant(MeasurementType measurementType, String tenant) {
+    public MeasurementTypeDTO saveByTenant(MeasurementType measurementType, String tenant) {
         return executeSafely(() -> {
             if (measurementType.getId() == null) {
-                return createMeasurementTypeForTenant(measurementType, tenant);
+                return measurementTypeMapper.toDTO(createMeasurementTypeForTenant(measurementType, tenant));
             } else {
-                return updateMeasurementTypeForTenant(measurementType, tenant);
+                return measurementTypeMapper.toDTO(updateMeasurementTypeForTenant(measurementType, tenant));
             }
         });
     }
 
     @Override
     public void deleteByTenant(Long id, String tenant) {
-        MeasurementType measurementType = findByIdAndTenant(id, tenant);
+        MeasurementType measurementType = measurementTypeRepository.findByIdAndTenant(id, tenant)
+                .orElseThrow(() -> new ApiNotFoundException("Tipo de Medida con id " + id + " no encontrada"));
+
         measurementTypeRepository.delete(measurementType);
     }
 
@@ -54,7 +60,9 @@ public class MeasurementTypeService implements IMeasurementTypeService {
     }
 
     private MeasurementType updateMeasurementTypeForTenant(MeasurementType measurementType, String tenant) {
-        MeasurementType measurementTypeDB = findByIdAndTenant(measurementType.getId(), tenant);
+        MeasurementType measurementTypeDB = measurementTypeRepository.findByIdAndTenant(measurementType.getId(), tenant)
+                .orElseThrow(() -> new ApiNotFoundException("Tipo de Medida con id " + measurementType.getId() + " no encontrada"));
+        
         measurementTypeDB.loadFromEntityToUpdate(measurementType);
         return measurementTypeRepository.save(measurementTypeDB);
     }

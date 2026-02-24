@@ -2,6 +2,8 @@ package com.nutrisaas.definitions.tenant.controller;
 
 import com.nutrisaas.core.security.TokenProvider;
 import com.nutrisaas.core.security.tenant.TenantContext;
+import com.nutrisaas.definitions.tenant.dto.PatientDTO;
+import com.nutrisaas.definitions.tenant.mapper.PatientMapper;
 import com.nutrisaas.definitions.tenant.model.Patient;
 import com.nutrisaas.definitions.tenant.service.IPatientService;
 import lombok.RequiredArgsConstructor;
@@ -18,28 +20,29 @@ public class PatientController {
 
     private final IPatientService patientService;
     private final TokenProvider tokenProvider;
+    private final PatientMapper patientMapper;
 
     @GetMapping
-    public ResponseEntity<List<Patient>> findByTenant() {
+    public ResponseEntity<List<PatientDTO>> findByTenant() {
         return ResponseEntity.ok(patientService.getAllByTenant(TenantContext.getTenant()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Patient> getByIdAndTenant(@PathVariable Long id) {
+    public ResponseEntity<PatientDTO> getByIdAndTenant(@PathVariable Long id) {
         return ResponseEntity.ok(patientService.getByIdAndTenant(id, TenantContext.getTenant()));
     }
 
     @PostMapping
-    public ResponseEntity<Patient> createByTenant(@RequestBody Patient data) {
+    public ResponseEntity<PatientDTO> createByTenant(@RequestBody Patient data) {
         data.setId(null);
-        Patient created = patientService.saveByTenant(data, TenantContext.getTenant());
+        PatientDTO created = patientService.saveByTenant(data, TenantContext.getTenant());
         return ResponseEntity.created(URI.create("/api/tenant/patients")).body(created);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Patient> updateByTenant(@PathVariable Long id, @RequestBody Patient data) {
+    public ResponseEntity<PatientDTO> updateByTenant(@PathVariable Long id, @RequestBody Patient data) {
         data.setId(id);
-        Patient updated = patientService.saveByTenant(data, TenantContext.getTenant());
+        PatientDTO updated = patientService.saveByTenant(data, TenantContext.getTenant());
         return ResponseEntity.ok(updated);
     }
 

@@ -6,5 +6,9 @@ import lombok.Data;
 public class MeasurementTypeDTO {
     private String id;
     private String name;
+    private String symbol;
+    private UnitDTO defaultUnit;
+    private Boolean active;
+    private String displayName;
 }
 
