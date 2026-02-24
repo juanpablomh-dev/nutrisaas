@@ -1,6 +1,9 @@
 package com.nutrisaas.definitions.tenant.repository;
 
 import com.nutrisaas.definitions.tenant.model.Appointment;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -9,6 +12,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long>, JpaSpecificationExecutor<Appointment> {
+
+    @EntityGraph(attributePaths = {
+            "patient",
+            "measurements",
+            "measurements.measurementType",
+            "measurements.unit"
+    })
+    List<Appointment> findAll(Specification<Appointment> spec, Sort sort);
 
     List<Appointment> findByTenant(String tenant);
 

@@ -1,6 +1,7 @@
 package com.nutrisaas.definitions.tenant.service;
 
-import com.nutrisaas.definitions.tenant.dto.AppointmentListDto;
+import com.nutrisaas.definitions.tenant.dto.AppointmentDTO;
+import com.nutrisaas.definitions.tenant.dto.AppointmentFilterDTO;
 import com.nutrisaas.definitions.tenant.model.Appointment;
 
 import java.time.LocalDateTime;
@@ -8,15 +9,15 @@ import java.util.List;
 
 public interface IAppointmentService {
 
-    List<Appointment> findByListDto(String tenant, AppointmentListDto dto);
+    List<AppointmentDTO> findByListDto(String tenant, AppointmentFilterDTO dto);
 
-    List<Appointment> findByTenant(String tenant);
+    List<AppointmentDTO> findByTenant(String tenant);
 
-    Appointment findByIdAndTenant(Long id, String tenant);
-    
-    List<Appointment> findByTenantAndStartTimeBetween(String tenant, LocalDateTime start, LocalDateTime end);
+    AppointmentDTO findByIdAndTenant(Long id, String tenant);
 
-    Appointment saveByTenant(Appointment appointment, String tenant);
+    List<AppointmentDTO> findByTenantAndStartTimeBetween(String tenant, LocalDateTime start, LocalDateTime end);
+
+    AppointmentDTO saveByTenant(Appointment appointment, String tenant);
 
     void deleteByTenant(Long id, String tenant);
 

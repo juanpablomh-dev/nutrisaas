@@ -2,7 +2,9 @@ package com.nutrisaas.definitions.tenant.service;
 
 import com.nutrisaas.core.exception.ApiConflictException;
 import com.nutrisaas.core.exception.ApiNotFoundException;
-import com.nutrisaas.definitions.tenant.dto.AppointmentListDto;
+import com.nutrisaas.definitions.tenant.dto.AppointmentDTO;
+import com.nutrisaas.definitions.tenant.dto.AppointmentFilterDTO;
+import com.nutrisaas.definitions.tenant.mapper.AppointmentMapper;
 import com.nutrisaas.definitions.tenant.model.Appointment;
 import com.nutrisaas.definitions.tenant.model.Measurement;
 import com.nutrisaas.definitions.tenant.repository.AppointmentRepository;
@@ -16,6 +18,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,100 +34,112 @@ public class AppointmentService implements IAppointmentService {
 
     private final AppointmentRepository appointmentRepository;
     private final MeasurementRepository measurementRepository;
+    private final AppointmentMapper appointmentMapper;
 
     @Override
-    public List<Appointment> findByListDto(String tenant, AppointmentListDto dto) {
+    @Transactional(readOnly = true)
+    public List<AppointmentDTO> findByListDto(String tenant, AppointmentFilterDTO dto) {
 
         Specification<Appointment> spec = (root, query, cb) -> {
+
             List<Predicate> predicates = new ArrayList<>();
 
-            // tenant obligatorio
+            // Tenant obligatorio
             predicates.add(cb.equal(root.get("tenant"), tenant));
 
-            // fetch del patient para evitar proxies y N+1
-            // solo añadimos fetch si no es una count query
-            try {
-                if (query.getResultType() != Long.class) {
-                    root.fetch("patient", JoinType.LEFT);
-                    query.distinct(true);
-                }
-            } catch (Exception e) {
-                // ignore si no se puede hacer fetch (defensivo)
+            // Date range
+            if (dto.getFromDate() != null) {
+                predicates.add(
+                        cb.greaterThanOrEqualTo(root.get("startTime"), dto.getFromDate())
+                );
             }
 
-            // fromDate >= startTime
-            LocalDateTime from = dto.getFromDate();
-            if (from != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("startTime"), from));
+            if (dto.getToDate() != null) {
+                predicates.add(
+                        cb.lessThanOrEqualTo(root.get("startTime"), dto.getToDate())
+                );
             }
 
-            // toDate <= startTime (si prefieres filtrar por endTime ajusta aquí)
-            LocalDateTime to = dto.getToDate();
-            if (to != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("startTime"), to));
-            }
+            // Patient filter
+            if (dto.getPatientId() != null && !dto.getPatientId().isBlank()) {
 
-            // patientId
-            if (dto.getPatientId() != null && !dto.getPatientId().trim().isEmpty()) {
                 try {
-                    Long pid = Long.parseLong(dto.getPatientId());
-                    // si patient es una relación, usamos join
-                    Join<Object, Object> patientJoin = root.join("patient", JoinType.INNER);
-                    predicates.add(cb.equal(patientJoin.get("id"), pid));
-                } catch (NumberFormatException nfe) {
-                    // si no es número, ignoramos el filtro
+                    Long patientId = Long.parseLong(dto.getPatientId());
+
+                    Join<Appointment, Object> patientJoin = root.join("patient", JoinType.INNER);
+
+                    predicates.add(
+                            cb.equal(patientJoin.get("id"), patientId)
+                    );
+
+                } catch (NumberFormatException ignored) {
                 }
             }
 
-            // status
-            if (dto.getStatus() != null && !dto.getStatus().trim().isEmpty()) {
-                predicates.add(cb.equal(root.get("status"), dto.getStatus().trim()));
+            // Status filter
+            if (dto.getStatus() != null && !dto.getStatus().isBlank()) {
+                predicates.add(
+                        cb.equal(root.get("status"), dto.getStatus().trim())
+                );
             }
 
-            // type (cita o remoto)
+            // Type filter
             if (dto.getType() == 0 || dto.getType() == 1) {
-                predicates.add(cb.equal(root.get("type"), dto.getType()));
+                predicates.add(
+                        cb.equal(root.get("type"), dto.getType())
+                );
             } else {
-                predicates.add(cb.equal(root.get("type"), 0));
+                predicates.add(
+                        cb.equal(root.get("type"), 0)
+                );
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
 
-        return appointmentRepository.findAll(spec, Sort.by(Sort.Direction.ASC, "startTime"));
+        List<Appointment> appointments =
+                appointmentRepository.findAll(spec,
+                        Sort.by(Sort.Direction.ASC, "startTime"));
+
+        return appointmentMapper.toDTOList(appointments);
+    }
+
+
+    @Override
+    public List<AppointmentDTO> findByTenant(String tenant) {
+        return appointmentMapper.toDTOList(appointmentRepository.findByTenant(tenant));
     }
 
     @Override
-    public List<Appointment> findByTenant(String tenant) {
-        return appointmentRepository.findByTenant(tenant);
-    }
-
-    @Override
-    public Appointment findByIdAndTenant(Long id, String tenant) {
-        return appointmentRepository.findByIdAndTenant(id, tenant)
+    public AppointmentDTO findByIdAndTenant(Long id, String tenant) {
+        Appointment appointment = appointmentRepository.findByIdAndTenant(id, tenant)
                 .orElseThrow(() -> new ApiNotFoundException("Cita con id " + id + " no encontrada"));
+
+        return appointmentMapper.toDTO(appointment);
     }
 
     @Override
-    public List<Appointment> findByTenantAndStartTimeBetween(String tenant, LocalDateTime start, LocalDateTime end) {
-        return appointmentRepository.findByTenantAndStartTimeBetween(tenant, start, end);
+    public List<AppointmentDTO> findByTenantAndStartTimeBetween(String tenant, LocalDateTime start, LocalDateTime end) {
+        return appointmentMapper.toDTOList(appointmentRepository.findByTenantAndStartTimeBetween(tenant, start, end));
     }
 
     @Override
-    public Appointment saveByTenant(Appointment appointment, String tenant) {
+    public AppointmentDTO saveByTenant(Appointment appointment, String tenant) {
         return executeSafely(() -> {
             if (appointment.getId() == null || appointment.getId() == 0) {
-                return createAppointmentForTenant(appointment, tenant);
+                return appointmentMapper.toDTO(createAppointmentForTenant(appointment, tenant));
             } else {
-                return updateAppointmentForTenant(appointment, tenant);
+                return appointmentMapper.toDTO(updateAppointmentForTenant(appointment, tenant));
             }
         });
     }
 
     @Override
     public void deleteByTenant(Long id, String tenant) {
-        Appointment appointment = findByIdAndTenant(id, tenant);
-        appointmentRepository.delete(appointment);
+        Appointment appointmentBD = appointmentRepository.findByIdAndTenant(id, tenant)
+                .orElseThrow(() -> new ApiNotFoundException("Cita con id " + id + " no encontrada"));
+
+        appointmentRepository.delete(appointmentBD);
     }
 
 
@@ -148,7 +163,8 @@ public class AppointmentService implements IAppointmentService {
     }
 
     private Appointment updateAppointmentForTenant(Appointment appointment, String tenant) {
-        Appointment appointmentBD = findByIdAndTenant(appointment.getId(), tenant);
+        Appointment appointmentBD = appointmentRepository.findByIdAndTenant(appointment.getId(), tenant)
+                .orElseThrow(() -> new ApiNotFoundException("Cita con id " + appointment.getId() + " no encontrada"));
 
         appointmentBD.setStartTime(appointment.getStartTime());
         appointmentBD.setStatus(appointment.getStatus());
