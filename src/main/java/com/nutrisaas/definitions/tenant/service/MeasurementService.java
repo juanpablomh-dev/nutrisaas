@@ -2,6 +2,8 @@ package com.nutrisaas.definitions.tenant.service;
 
 import com.nutrisaas.core.exception.ApiConflictException;
 import com.nutrisaas.core.exception.ApiNotFoundException;
+import com.nutrisaas.definitions.tenant.dto.MeasurementDTO;
+import com.nutrisaas.definitions.tenant.mapper.MeasurementMapper;
 import com.nutrisaas.definitions.tenant.model.Measurement;
 import com.nutrisaas.definitions.tenant.repository.MeasurementRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,37 +17,42 @@ import java.util.List;
 public class MeasurementService implements IMeasurementService {
 
     private final MeasurementRepository measurementRepository;
+    private final MeasurementMapper measurementMapper;
 
     @Override
-    public List<Measurement> findByTenantAndPatientId(String tenant, Long patientId) {
-        return measurementRepository.findByTenantAndPatientId(tenant, patientId);
+    public List<MeasurementDTO> findByTenantAndPatientId(String tenant, Long patientId) {
+        return measurementMapper.toDTOList(measurementRepository.findByTenantAndPatientId(tenant, patientId));
     }
 
     @Override
-    public List<Measurement> findByTenantAndAppointment(String tenant, Long appointmentId) {
-        return measurementRepository.findByTenantAndAppointmentId(tenant, appointmentId);
+    public List<MeasurementDTO> findByTenantAndAppointment(String tenant, Long appointmentId) {
+        return measurementMapper.toDTOList(measurementRepository.findByTenantAndAppointmentId(tenant, appointmentId));
     }
 
     @Override
-    public Measurement getByIdAndTenant(String id, String tenant) {
-        return measurementRepository.findByIdAndTenant(id, tenant)
+    public MeasurementDTO getByIdAndTenant(String id, String tenant) {
+        Measurement measurement = measurementRepository.findByIdAndTenant(id, tenant)
                 .orElseThrow(() -> new ApiNotFoundException("Medida con id " + id + " no encontrada"));
+
+        return measurementMapper.toDTO(measurement);
     }
 
     @Override
-    public Measurement saveByTenant(Measurement measurement, String tenant) {
+    public MeasurementDTO saveByTenant(Measurement measurement, String tenant) {
         return executeSafely(() -> {
             if (measurement.getId() == null) {
-                return createMeasurementForTenant(measurement, tenant);
+                return measurementMapper.toDTO(createMeasurementForTenant(measurement, tenant));
             } else {
-                return updateMeasurementForTenant(measurement, tenant);
+                return measurementMapper.toDTO(updateMeasurementForTenant(measurement, tenant));
             }
         });
     }
 
     @Override
     public void deleteByIdAndTenant(String id, String tenant) {
-        Measurement measurement = getByIdAndTenant(id, tenant);
+        Measurement measurement = measurementRepository.findByIdAndTenant(id, tenant)
+                .orElseThrow(() -> new ApiNotFoundException("Medida con id " + id + " no encontrada"));
+
         measurementRepository.delete(measurement);
     }
 
@@ -58,8 +65,9 @@ public class MeasurementService implements IMeasurementService {
     }
 
     private Measurement updateMeasurementForTenant(Measurement measurement, String tenant) {
-        Measurement measurementDB = getByIdAndTenant(measurement.getId(), tenant);
-        //validateUniqueSymbol(unit);
+        Measurement measurementDB = measurementRepository.findByIdAndTenant(measurement.getId(), tenant)
+                .orElseThrow(() -> new ApiNotFoundException("Medida con id " + measurement.getId() + " no encontrada"));
+
         measurementDB.loadFromEntityToUpdate(measurement);
         return measurementRepository.save(measurementDB);
     }

@@ -2,6 +2,7 @@ package com.nutrisaas.definitions.tenant.controller;
 
 import com.nutrisaas.core.security.TokenProvider;
 import com.nutrisaas.core.security.tenant.TenantContext;
+import com.nutrisaas.definitions.tenant.dto.MeasurementDTO;
 import com.nutrisaas.definitions.tenant.model.Measurement;
 import com.nutrisaas.definitions.tenant.service.IMeasurementService;
 import lombok.RequiredArgsConstructor;
@@ -19,17 +20,17 @@ public class MeasurementController {
     private final TokenProvider tokenProvider;
 
     @GetMapping("/patient/{patientId}")
-    public ResponseEntity<List<Measurement>> findByTenantAndPatientId(@PathVariable Long patientId) {
+    public ResponseEntity<List<MeasurementDTO>> findByTenantAndPatientId(@PathVariable Long patientId) {
         return ResponseEntity.ok(measurementService.findByTenantAndPatientId(TenantContext.getTenant(), patientId));
     }
 
     @GetMapping("/appointment/{appointmentId}")
-    public ResponseEntity<List<Measurement>> findByTenantAndAppointment(@PathVariable Long appointmentId) {
+    public ResponseEntity<List<MeasurementDTO>> findByTenantAndAppointment(@PathVariable Long appointmentId) {
         return ResponseEntity.ok(measurementService.findByTenantAndAppointment(TenantContext.getTenant(), appointmentId));
     }
 
     @PostMapping
-    public ResponseEntity<Measurement> saveByTenant(@RequestBody Measurement measurement) {
+    public ResponseEntity<MeasurementDTO> saveByTenant(@RequestBody Measurement measurement) {
         return ResponseEntity.ok(measurementService.saveByTenant(measurement, TenantContext.getTenant()));
     }
 
