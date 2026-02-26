@@ -2,15 +2,15 @@ package com.nutrisaas.definitions.tenant.dto;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 @Data
-public class UnitDTO {
+public class CalculatedMeasurementDTO {
     private String id;
-    private String name;
     private String symbol;
+    private String name;
     private String description;
+    private String formula;
+    private UnitDTO resultUnit;
     private Boolean active;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String displayName;
+
 }

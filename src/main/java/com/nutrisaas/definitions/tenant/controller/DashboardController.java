@@ -13,72 +13,118 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/tenant/dashboard/patient")
+@RequestMapping("/api/patients/{patientId}/dashboard")
 @RequiredArgsConstructor
 public class DashboardController {
 
     private final IDashboardService dashboardService;
 
-    // snapshot: latest or previous
-    @GetMapping("/{patientId}/snapshot")
-    public Map<String, Object> snapshot(
+    // SNAPSHOT
+
+    @GetMapping("/snapshot")
+    public ResponseEntity<ApiResponseDTO<PatientDashboardSnapshotDTO>> getSnapshot(
             @PathVariable Long patientId,
             @RequestParam(defaultValue = "true") boolean latest
     ) {
-        PatientDashboardSnapshotDTO dto = dashboardService.getSnapshot(TenantContext.getTenant(), patientId, latest);
-        return Map.of("data", dto);
+        PatientDashboardSnapshotDTO dto =
+                dashboardService.getSnapshot(TenantContext.getTenant(), patientId, latest);
+
+        return ResponseEntity.ok(new ApiResponseDTO<>(dto));
     }
 
-    @GetMapping("/{patientId}/history")
-    public ResponseEntity<List<PatientHistoricalDTO>> history(
+    // HISTORY
+
+    @GetMapping("/history")
+    public ResponseEntity<ListResponseDTO<PatientHistoricalDTO>> getHistory(
             @PathVariable Long patientId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to
     ) {
-        List<PatientHistoricalDTO> list = dashboardService.getHistorical(TenantContext.getTenant(), patientId, from, to);
-        return ResponseEntity.ok(list);
+
+        validateRange(from, to);
+        List<PatientHistoricalDTO> list =
+                dashboardService.getHistorical(TenantContext.getTenant(), patientId, from, to);
+
+        return ResponseEntity.ok(new ListResponseDTO<>(list));
     }
 
+    // KPIS
 
-    // kpis (latest + previous computed from history range)
-    @GetMapping("/{patientId}/kpis")
-    public Map<String, Object> kpis(
+    @GetMapping("/kpis")
+    public ResponseEntity<ListResponseDTO<KPIDTO>> getKpis(
             @PathVariable Long patientId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to
     ) {
-        List<KPIDTO> res = dashboardService.getKPIs(TenantContext.getTenant(), patientId, from, to);
-        return Map.of("data", res);
+
+        validateRange(from, to);
+        List<KPIDTO> list =
+                dashboardService.getKPIs(TenantContext.getTenant(), patientId, from, to);
+
+        return ResponseEntity.ok(new ListResponseDTO<>(list));
     }
 
-    // evolution: receives metrics csv (symbols) as query param 'metrics' or multiple metrics
-    @GetMapping("/{patientId}/evolution")
-    public Map<String, Object> evolution(
+    // EVOLUTION
+
+    @GetMapping("/evolution")
+    public ResponseEntity<ListResponseDTO<EvolutionPointDTO>> getEvolution(
             @PathVariable Long patientId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
             @RequestParam(required = false) List<String> metrics
     ) {
-        List<EvolutionPointDTO> s = dashboardService.getEvolution(TenantContext.getTenant(), patientId, from, to, metrics == null ? List.of("WEIGHT") : metrics);
-        return Map.of("data", s);
+
+        validateRange(from, to);
+        List<String> requestedMetrics =
+                (metrics == null || metrics.isEmpty())
+                        ? List.of("WEIGHT")
+                        : metrics;
+
+        List<EvolutionPointDTO> list =
+                dashboardService.getEvolution(TenantContext.getTenant(), patientId, from, to, requestedMetrics);
+
+        return ResponseEntity.ok(new ListResponseDTO<>(list));
     }
 
-    // compare two periods: provide fromA,toA,fromB,toB as ISO local datetime
-    @GetMapping("/{patientId}/compare")
-    public Map<String, Object> compare(
+    // COMPARE
+
+    @GetMapping("/compare")
+    public ResponseEntity<ListResponseDTO<ComparisonResultDTO>> comparePeriods(
             @PathVariable Long patientId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromA,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toA,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromB,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toB
     ) {
-        List<ComparisonResultDTO> res = dashboardService.comparePeriods(TenantContext.getTenant(), patientId, fromA, toA, fromB, toB);
-        return Map.of("data", res);
+
+        validateRange(fromA, toA);
+        validateRange(fromB, toB);
+        List<ComparisonResultDTO> list =
+                dashboardService.comparePeriods(TenantContext.getTenant(), patientId, fromA, toA, fromB, toB);
+
+        return ResponseEntity.ok(new ListResponseDTO<>(list));
     }
 
-    @GetMapping("/{patientId}/metrics")
-    public ResponseEntity<?> getMetrics(@PathVariable("patientId") Long patientId) {
+    // METRICS
+
+    @GetMapping("/metrics")
+    public ResponseEntity<ApiResponseDTO<Map<String, String>>> getAvailableMetrics(
+            @PathVariable Long patientId
+    ) {
+
         Map<String, String> metrics = dashboardService.getAvailableMetrics(TenantContext.getTenant());
-        return ResponseEntity.ok(metrics);
+
+        return ResponseEntity.ok(new ApiResponseDTO<>(metrics));
+    }
+
+    // VALIDATION
+
+    private void validateRange(LocalDateTime from, LocalDateTime to) {
+        if (from == null || to == null) {
+            throw new IllegalArgumentException("Date range is required");
+        }
+        if (from.isAfter(to)) {
+            throw new IllegalArgumentException("from must be before to");
+        }
     }
 }

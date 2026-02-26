@@ -1,5 +1,6 @@
 package com.nutrisaas.definitions.tenant.service;
 
+import com.nutrisaas.definitions.tenant.dto.CalculatedMeasurementDTO;
 import com.nutrisaas.definitions.tenant.model.CalculatedMeasurement;
 import com.nutrisaas.definitions.tenant.model.Unit;
 
@@ -41,7 +42,7 @@ public interface ICalculatedMeasurementService {
      * @param cm entidad a guardar
      * @return la entidad persistida
      */
-    CalculatedMeasurement save(CalculatedMeasurement cm);
+    CalculatedMeasurementDTO save(CalculatedMeasurement cm);
 
     /**
      * Actualiza un CalculatedMeasurement existente.
@@ -50,7 +51,7 @@ public interface ICalculatedMeasurementService {
      * @param payload datos con los que actualizar
      * @return la entidad actualizada
      */
-    CalculatedMeasurement update(Long id, CalculatedMeasurement payload);
+    CalculatedMeasurementDTO update(Long id, CalculatedMeasurement payload);
 
     /**
      * Lista las fórmulas definidas para un tenant, ordenadas por nombre.
@@ -58,7 +59,7 @@ public interface ICalculatedMeasurementService {
      * @param tenant identificador del tenant
      * @return lista de CalculatedMeasurement
      */
-    List<CalculatedMeasurement> listByTenant(String tenant);
+    List<CalculatedMeasurementDTO> listByTenant(String tenant);
 
     /**
      * Busca un CalculatedMeasurement por su id.
@@ -66,5 +67,5 @@ public interface ICalculatedMeasurementService {
      * @param id identificador
      * @return Optional con la entidad si existe
      */
-    Optional<CalculatedMeasurement> findById(Long id);
+    Optional<CalculatedMeasurementDTO> findById(Long id);
 }

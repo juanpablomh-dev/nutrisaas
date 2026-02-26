@@ -2,6 +2,8 @@ package com.nutrisaas.definitions.tenant.service;
 
 import com.nutrisaas.core.exception.ApiConflictException;
 import com.nutrisaas.core.exception.ApiNotFoundException;
+import com.nutrisaas.definitions.tenant.dto.UnitDTO;
+import com.nutrisaas.definitions.tenant.mapper.UnitMapper;
 import com.nutrisaas.definitions.tenant.model.Unit;
 import com.nutrisaas.definitions.tenant.repository.UnitRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,38 +19,42 @@ import java.util.List;
 public class UnitService implements IUnitService {
 
     private final UnitRepository unitRepository;
+    private final UnitMapper unitMapper;
 
     @Override
-    public List<Unit> findByTenant(String tenant) {
-        return unitRepository.findByTenantOrderByNameAsc(tenant);
+    public List<UnitDTO> findByTenant(String tenant) {
+        return unitMapper.toDTOList(unitRepository.findByTenantOrderByNameAsc(tenant));
     }
 
     @Override
-    public Unit getByIdAndTenant(Long id, String tenant) {
-        return unitRepository.findByIdAndTenant(id, tenant)
+    public UnitDTO getByIdAndTenant(Long id, String tenant) {
+        Unit unit = unitRepository.findByIdAndTenant(id, tenant)
                 .orElseThrow(() -> new ApiNotFoundException("Unidad con id " + id + " no encontrada"));
+        return unitMapper.toDTO(unit);
     }
 
     @Override
-    public Unit getBySymbolAndTenant(String symbol, String tenant) {
-        return unitRepository.findBySymbolAndTenant(symbol, tenant)
+    public UnitDTO getBySymbolAndTenant(String symbol, String tenant) {
+        Unit unit = unitRepository.findBySymbolAndTenant(symbol, tenant)
                 .orElseThrow(() -> new ApiNotFoundException("Unidad con símbolo " + symbol + " no encontrada"));
+        return unitMapper.toDTO(unit);
     }
 
     @Override
-    public Unit saveByTenant(Unit unit, String tenant) {
+    public UnitDTO saveByTenant(Unit unit, String tenant) {
         return executeSafely(() -> {
             if (unit.getId() == null) {
-                return createUnitForTenant(unit, tenant);
+                return unitMapper.toDTO(createUnitForTenant(unit, tenant));
             } else {
-                return updateUnitForTenant(unit, tenant);
+                return unitMapper.toDTO(updateUnitForTenant(unit, tenant));
             }
         });
     }
 
     @Override
     public void deleteByTenant(Long id, String tenant) {
-        Unit unit = getByIdAndTenant(id, tenant);
+        Unit unit = unitRepository.findByIdAndTenant(id, tenant)
+                .orElseThrow(() -> new ApiNotFoundException("Unidad con id " + id + " no encontrada"));
         unitRepository.delete(unit);
     }
 
@@ -61,7 +67,8 @@ public class UnitService implements IUnitService {
     }
 
     private Unit updateUnitForTenant(Unit unit, String tenant) {
-        Unit unitDB = getByIdAndTenant(unit.getId(), tenant);
+        Unit unitDB = unitRepository.findByIdAndTenant(unit.getId(), tenant)
+                .orElseThrow(() -> new ApiNotFoundException("Unidad con id " + unit.getId() + " no encontrada"));
         validateUniqueSymbol(unit);
         unitDB.loadFromEntityToUpdate(unit);
         return unitRepository.save(unitDB);

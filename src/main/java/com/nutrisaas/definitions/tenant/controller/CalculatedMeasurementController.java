@@ -1,5 +1,6 @@
 package com.nutrisaas.definitions.tenant.controller;
 
+import com.nutrisaas.definitions.tenant.dto.CalculatedMeasurementDTO;
 import com.nutrisaas.definitions.tenant.model.CalculatedMeasurement;
 import com.nutrisaas.definitions.tenant.service.CalculatedMeasurementService;
 import lombok.AllArgsConstructor;
@@ -20,15 +21,14 @@ public class CalculatedMeasurementController {
     private final CalculatedMeasurementService calcService;
 
 
-    // Listar por tenant
     @GetMapping
-    public List<CalculatedMeasurement> list(@RequestParam String tenant) {
+    public List<CalculatedMeasurementDTO> list(@RequestParam String tenant) {
         return calcService.listByTenant(tenant);
     }
 
     // Obtener por id
     @GetMapping("/{id}")
-    public ResponseEntity<CalculatedMeasurement> get(@PathVariable Long id) {
+    public ResponseEntity<CalculatedMeasurementDTO> get(@PathVariable Long id) {
         return calcService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -36,15 +36,15 @@ public class CalculatedMeasurementController {
 
     // Crear
     @PostMapping
-    public ResponseEntity<CalculatedMeasurement> create(@RequestBody CalculatedMeasurement payload) {
-        CalculatedMeasurement saved = calcService.save(payload);
+    public ResponseEntity<CalculatedMeasurementDTO> create(@RequestBody CalculatedMeasurement payload) {
+        CalculatedMeasurementDTO saved = calcService.save(payload);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     // Actualizar
     @PutMapping("/{id}")
-    public ResponseEntity<CalculatedMeasurement> update(@PathVariable Long id, @RequestBody CalculatedMeasurement payload) {
-        CalculatedMeasurement updated = calcService.update(id, payload);
+    public ResponseEntity<CalculatedMeasurementDTO> update(@PathVariable Long id, @RequestBody CalculatedMeasurement payload) {
+        CalculatedMeasurementDTO updated = calcService.update(id, payload);
         return ResponseEntity.ok(updated);
     }
 

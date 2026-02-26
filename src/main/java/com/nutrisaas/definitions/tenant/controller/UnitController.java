@@ -2,6 +2,7 @@ package com.nutrisaas.definitions.tenant.controller;
 
 import com.nutrisaas.core.security.TokenProvider;
 import com.nutrisaas.core.security.tenant.TenantContext;
+import com.nutrisaas.definitions.tenant.dto.UnitDTO;
 import com.nutrisaas.definitions.tenant.model.Unit;
 import com.nutrisaas.definitions.tenant.service.IUnitService;
 import lombok.RequiredArgsConstructor;
@@ -20,31 +21,31 @@ public class UnitController {
     private final TokenProvider tokenProvider;
 
     @GetMapping
-    public ResponseEntity<List<Unit>> findByTenant() {
+    public ResponseEntity<List<UnitDTO>> findByTenant() {
         return ResponseEntity.ok(unitService.findByTenant(TenantContext.getTenant()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Unit> getByIdAndTenant(@PathVariable Long id) {
+    public ResponseEntity<UnitDTO> getByIdAndTenant(@PathVariable Long id) {
         return ResponseEntity.ok(unitService.getByIdAndTenant(id, TenantContext.getTenant()));
     }
 
     @GetMapping("/symbol/{symbol}")
-    public ResponseEntity<Unit> getBySymbolAndTenant(@PathVariable String symbol) {
+    public ResponseEntity<UnitDTO> getBySymbolAndTenant(@PathVariable String symbol) {
         return ResponseEntity.ok(unitService.getBySymbolAndTenant(symbol, TenantContext.getTenant()));
     }
 
     @PostMapping
-    public ResponseEntity<Unit> createByTenant(@RequestBody Unit data) {
+    public ResponseEntity<UnitDTO> createByTenant(@RequestBody Unit data) {
         data.setId(null);
-        Unit created = unitService.saveByTenant(data, TenantContext.getTenant());
+        UnitDTO created = unitService.saveByTenant(data, TenantContext.getTenant());
         return ResponseEntity.created(URI.create("/api/tenant/units")).body(created);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Unit> updateByTenant(@PathVariable Long id, @RequestBody Unit data) {
+    public ResponseEntity<UnitDTO> updateByTenant(@PathVariable Long id, @RequestBody Unit data) {
         data.setId(id);
-        Unit updated = unitService.saveByTenant(data, TenantContext.getTenant());
+        UnitDTO updated = unitService.saveByTenant(data, TenantContext.getTenant());
         return ResponseEntity.ok(updated);
     }
 

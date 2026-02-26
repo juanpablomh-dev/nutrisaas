@@ -1,5 +1,7 @@
 package com.nutrisaas.definitions.tenant.service;
 
+import com.nutrisaas.definitions.tenant.dto.CalculatedMeasurementDTO;
+import com.nutrisaas.definitions.tenant.mapper.CalculatedMeasurementMapper;
 import com.nutrisaas.definitions.tenant.model.CalculatedMeasurement;
 import com.nutrisaas.definitions.tenant.model.Measurement;
 import com.nutrisaas.definitions.tenant.model.Unit;
@@ -20,6 +22,7 @@ public class CalculatedMeasurementService implements ICalculatedMeasurementServi
     private final CalculatedMeasurementRepository calcRepo;
     private final MeasurementRepository measurementRepository;
     private final UnitRepository unitRepository;
+    private final CalculatedMeasurementMapper calculatedMeasurementMapper;
 
     /**
      * Evalúa la fórmula de un calculatedMeasurement para un paciente y tenant.
@@ -128,25 +131,25 @@ public class CalculatedMeasurementService implements ICalculatedMeasurementServi
         return vars;
     }
 
-    // Métodos CRUD sencillos
-    public CalculatedMeasurement save(CalculatedMeasurement cm) {
-        return calcRepo.save(cm);
+    public CalculatedMeasurementDTO save(CalculatedMeasurement cm) {
+        return calculatedMeasurementMapper.toDTO(calcRepo.save(cm));
     }
 
-    public CalculatedMeasurement update(Long id, CalculatedMeasurement payload) {
+    public CalculatedMeasurementDTO update(Long id, CalculatedMeasurement payload) {
         CalculatedMeasurement stored = calcRepo.findById(id).orElseThrow(() -> new NoSuchElementException("Not found"));
         stored.loadFromEntityToUpdate(payload);
         stored.setFormula(payload.getFormula());
         stored.setResultUnit(payload.getResultUnit());
         stored.setDisplayName(payload.getDisplayName());
-        return calcRepo.save(stored);
+        return calculatedMeasurementMapper.toDTO(calcRepo.save(stored));
     }
 
-    public List<CalculatedMeasurement> listByTenant(String tenant) {
-        return calcRepo.findByTenantOrderByNameAsc(tenant);
+    public List<CalculatedMeasurementDTO> listByTenant(String tenant) {
+        return calculatedMeasurementMapper.toDTOList(calcRepo.findByTenantOrderByNameAsc(tenant));
     }
 
-    public Optional<CalculatedMeasurement> findById(Long id) {
-        return calcRepo.findById(id);
+    public Optional<CalculatedMeasurementDTO> findById(Long id) {
+        return calcRepo.findById(id)
+                .map(calculatedMeasurementMapper::toDTO);
     }
 }
