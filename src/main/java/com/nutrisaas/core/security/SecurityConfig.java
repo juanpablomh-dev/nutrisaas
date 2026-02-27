@@ -45,7 +45,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**"
                         ).permitAll()
-                        
+
                         .requestMatchers("/app").permitAll()
                         .requestMatchers("/app/").permitAll()
                         .requestMatchers("/login").permitAll()
@@ -61,7 +61,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/tenant/appointments/list").permitAll()
 
                         .requestMatchers("/api/tenant/calculated/**").permitAll()
-                        .requestMatchers("/api/tenant/dashboard/patient/**").permitAll()
+                        .requestMatchers("/api/v1/tenant/dashboard/patient/**").permitAll()
 
                         .requestMatchers("/externos/**").permitAll()
                         .requestMatchers("/images/**").permitAll()

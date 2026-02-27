@@ -15,7 +15,7 @@ class ListRemoteMeasurements extends ListBase {
 
     static getEndpoints() {
         return {
-            K_SERVICE_GET: services.K_SERVICE_APPOINTMENT_POST_LIST,
+            K_SERVICE_GET: services.K_SERVICE_APPOINTMENT_POST_SEARCH,
             K_SERVICE_PUT: services.K_SERVICE_APPOINTMENT_PUT,
             K_SERVICE_DELETE: services.K_SERVICE_APPOINTMENT_DELETE
         };

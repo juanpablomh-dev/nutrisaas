@@ -10,20 +10,19 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tenant/appointments")
+@RequestMapping("/api/v1/tenant/appointments")
 @RequiredArgsConstructor
 public class AppointmentController {
 
     private final IAppointmentService appointmentService;
     private final TokenProvider tokenProvider;
 
-    @PostMapping("/list")
+    @PostMapping("/search")
     public ResponseEntity<List<AppointmentDTO>> list(@RequestBody AppointmentFilterDTO appointmentFilterDTO) {
         return ResponseEntity.ok(appointmentService.findByListDto(TenantContext.getTenant(), appointmentFilterDTO));
     }
@@ -38,22 +37,27 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.findByIdAndTenant(id, TenantContext.getTenant()));
     }
 
-    @GetMapping("/range")
+   /* @GetMapping("/range")
     public ResponseEntity<List<AppointmentDTO>> getByDateRange(
             @RequestParam("start") LocalDateTime start,
             @RequestParam("end") LocalDateTime end) {
         return ResponseEntity.ok(appointmentService.findByTenantAndStartTimeBetween(TenantContext.getTenant(), start, end));
-    }
+    }*/
 
     @PostMapping
     public ResponseEntity<AppointmentDTO> createByTenant(@RequestBody Appointment appointment) {
         appointment.setId(null);
         AppointmentDTO created = appointmentService.saveByTenant(appointment, TenantContext.getTenant());
-        return ResponseEntity.created(URI.create("/api/tenant/appointments")).body(created);
+        return ResponseEntity.created(ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(created.getId())
+                .toUri()).body(created);
     }
 
-    @PutMapping()
-    public ResponseEntity<AppointmentDTO> updateByTenant(@RequestBody Appointment appointment) {
+    @PutMapping("/{id}")
+    public ResponseEntity<AppointmentDTO> update(@PathVariable Long id, @RequestBody Appointment appointment) {
+        appointment.setId(id);
         AppointmentDTO updated = appointmentService.saveByTenant(appointment, TenantContext.getTenant());
         return ResponseEntity.ok(updated);
     }

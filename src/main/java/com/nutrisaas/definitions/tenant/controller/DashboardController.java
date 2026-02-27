@@ -13,112 +13,134 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/patients/{patientId}/dashboard")
+@RequestMapping("/api/v1/tenant/dashboard/patient/{patientId}")
 @RequiredArgsConstructor
 public class DashboardController {
 
     private final IDashboardService dashboardService;
 
     // SNAPSHOT
-
     @GetMapping("/snapshot")
-    public ResponseEntity<ApiResponseDTO<PatientDashboardSnapshotDTO>> getSnapshot(
+    public ResponseEntity<PatientDashboardSnapshotDTO> getSnapshot(
             @PathVariable Long patientId,
             @RequestParam(defaultValue = "true") boolean latest
     ) {
         PatientDashboardSnapshotDTO dto =
-                dashboardService.getSnapshot(TenantContext.getTenant(), patientId, latest);
+                dashboardService.getSnapshot(
+                        TenantContext.getTenant(),
+                        patientId,
+                        latest
+                );
 
-        return ResponseEntity.ok(new ApiResponseDTO<>(dto));
+        return ResponseEntity.ok(dto);
     }
 
     // HISTORY
-
     @GetMapping("/history")
-    public ResponseEntity<ListResponseDTO<PatientHistoricalDTO>> getHistory(
+    public ResponseEntity<List<PatientHistoricalDTO>> getHistory(
             @PathVariable Long patientId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to
     ) {
-
         validateRange(from, to);
-        List<PatientHistoricalDTO> list =
-                dashboardService.getHistorical(TenantContext.getTenant(), patientId, from, to);
 
-        return ResponseEntity.ok(new ListResponseDTO<>(list));
+        List<PatientHistoricalDTO> list =
+                dashboardService.getHistorical(
+                        TenantContext.getTenant(),
+                        patientId,
+                        from,
+                        to
+                );
+
+        return ResponseEntity.ok(list);
     }
 
     // KPIS
-
     @GetMapping("/kpis")
-    public ResponseEntity<ListResponseDTO<KPIDTO>> getKpis(
+    public ResponseEntity<List<KPIDTO>> getKpis(
             @PathVariable Long patientId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to
     ) {
-
         validateRange(from, to);
-        List<KPIDTO> list =
-                dashboardService.getKPIs(TenantContext.getTenant(), patientId, from, to);
 
-        return ResponseEntity.ok(new ListResponseDTO<>(list));
+        List<KPIDTO> list =
+                dashboardService.getKPIs(
+                        TenantContext.getTenant(),
+                        patientId,
+                        from,
+                        to
+                );
+
+        return ResponseEntity.ok(list);
     }
 
     // EVOLUTION
-
     @GetMapping("/evolution")
-    public ResponseEntity<ListResponseDTO<EvolutionPointDTO>> getEvolution(
+    public ResponseEntity<List<EvolutionPointDTO>> getEvolution(
             @PathVariable Long patientId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
             @RequestParam(required = false) List<String> metrics
     ) {
-
         validateRange(from, to);
+
         List<String> requestedMetrics =
                 (metrics == null || metrics.isEmpty())
                         ? List.of("WEIGHT")
                         : metrics;
 
         List<EvolutionPointDTO> list =
-                dashboardService.getEvolution(TenantContext.getTenant(), patientId, from, to, requestedMetrics);
+                dashboardService.getEvolution(
+                        TenantContext.getTenant(),
+                        patientId,
+                        from,
+                        to,
+                        requestedMetrics
+                );
 
-        return ResponseEntity.ok(new ListResponseDTO<>(list));
+        return ResponseEntity.ok(list);
     }
 
     // COMPARE
-
     @GetMapping("/compare")
-    public ResponseEntity<ListResponseDTO<ComparisonResultDTO>> comparePeriods(
+    public ResponseEntity<List<ComparisonResultDTO>> comparePeriods(
             @PathVariable Long patientId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromA,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toA,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromB,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toB
     ) {
-
         validateRange(fromA, toA);
         validateRange(fromB, toB);
-        List<ComparisonResultDTO> list =
-                dashboardService.comparePeriods(TenantContext.getTenant(), patientId, fromA, toA, fromB, toB);
 
-        return ResponseEntity.ok(new ListResponseDTO<>(list));
+        List<ComparisonResultDTO> list =
+                dashboardService.comparePeriods(
+                        TenantContext.getTenant(),
+                        patientId,
+                        fromA,
+                        toA,
+                        fromB,
+                        toB
+                );
+
+        return ResponseEntity.ok(list);
     }
 
     // METRICS
-
     @GetMapping("/metrics")
-    public ResponseEntity<ApiResponseDTO<Map<String, String>>> getAvailableMetrics(
+    public ResponseEntity<Map<String, String>> getAvailableMetrics(
             @PathVariable Long patientId
     ) {
+        Map<String, String> metrics =
+                dashboardService.getAvailableMetrics(
+                        TenantContext.getTenant()
+                );
 
-        Map<String, String> metrics = dashboardService.getAvailableMetrics(TenantContext.getTenant());
-
-        return ResponseEntity.ok(new ApiResponseDTO<>(metrics));
+        return ResponseEntity.ok(metrics);
     }
 
     // VALIDATION
-
     private void validateRange(LocalDateTime from, LocalDateTime to) {
         if (from == null || to == null) {
             throw new IllegalArgumentException("Date range is required");

@@ -283,7 +283,7 @@ class EditorAppointment {
 
         const method = payload.id ? "PUT" : "POST";
         const endpoint = payload.id
-            ? services.K_SERVICE_APPOINTMENT_PUT
+            ? services.K_SERVICE_APPOINTMENT_PUT + "/" + payload.id
             : services.K_SERVICE_APPOINTMENT_POST;
 
         Utiles.secureRequest(method, endpoint, payload, (res) => {

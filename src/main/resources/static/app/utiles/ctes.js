@@ -56,11 +56,11 @@ let services = {
     K_SERVICE_PATIENT_PUT: "/api/tenant/patients",
     K_SERVICE_PATIENT_DELETE: "/api/tenant/patients",
     // Appointment
-    K_SERVICE_APPOINTMENT_GET: "/api/tenant/appointments",
-    K_SERVICE_APPOINTMENT_POST: "/api/tenant/appointments",
-    K_SERVICE_APPOINTMENT_PUT: "/api/tenant/appointments",
-    K_SERVICE_APPOINTMENT_DELETE: "/api/tenant/appointments",
-    K_SERVICE_APPOINTMENT_POST_LIST: "/api/tenant/appointments/list",
+    K_SERVICE_APPOINTMENT_GET: "/api/v1/tenant/appointments",
+    K_SERVICE_APPOINTMENT_POST: "/api/v1/tenant/appointments",
+    K_SERVICE_APPOINTMENT_PUT: "/api/v1/tenant/appointments",
+    K_SERVICE_APPOINTMENT_DELETE: "/api/v1/tenant/appointments",
+    K_SERVICE_APPOINTMENT_POST_SEARCH: "/api/v1/tenant/appointments/search",
     // Dashboard
-    K_SERVICE_DASHBOARD_GET: "/api/tenant/dashboard/patient"
+    K_SERVICE_DASHBOARD_GET: "/api/v1/tenant/dashboard/patient"
 };
